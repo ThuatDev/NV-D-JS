@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sinh viên</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  </head>
+
+  <body>
+    <form>
+      <div class="error-message"></div>
+      <div>
+        <label>Tên</label>
+        <input type="text" name="name" /><br />
+        <span class="form-message"></span>
+      </div>
+      <br />
+      <div>
+        <label>Địa chỉ</label>
+        <input type="text" name="address" /><br />
+        <span class="form-message"></span>
+      </div>
+      <div>
+        <button id="create">Thêm</button>
+        <button style="display: none" id="update">Sửa</button>
+      </div>
+    </form>
+
+    <ul id="list-students"></ul>
+    <script src="scrip.js"></script>
+    <script>
+      $(document).ready(function () {
+        const students = [
+          { id: "1", name: "Dinh", address: "hue" },
+          { id: "2", name: "Nam", address: "quang nam" },
+          { id: "3", name: "Tan", address: "da nang" },
+          { id: "4", name: "Hung", address: "hue" },
+          { id: "5", name: "Tri", address: "quang tri" },
+          { id: "6", name: "Anh", address: "hue" },
+          { id: "7", name: "Binh", address: "da nang" },
+        ];
+
+        const form = $("form");
+        const formMessageElement = $(".form-message");
+        const nameInput = $('input[name="name"]');
+        const addressInput = $('input[name="address"]');
+        const createButton = $("#create");
+        const updateButton = $("#update");
+        const lisStudents = $("#list-students");
+        let currentIndex = -1;
+        let isEditing = false;
+
+        const validateInput = (name, address) =>
+          name.trim() !== "" && address.trim() !== "";
+
+        const formMessages = ["vui long nhap day du thong tin"];
+
+        function displayStudent() {
+          lisStudents.html(
+            students
+              .map(
+                (student) => `
+            <li>
+              ${student.name}.${student.address}
+              <button class='edit' data-index="${student.id}">Sửa</button>
+              <button class='delete' data-index="${student.id}">Xoa</button>
+            </li>
+          `
+              )
+              .join("")
+          );
+        }
+
+        const addStudent = (name, address) => {
+          students.push({
+            id: (students.length + 1).toString(),
+            name,
+            address,
+          });
+
+          displayStudent();
+          clearForm();
+        };
+
+        function editStudent(index) {
+          const student = students.find((s) => s.id === index);
+          nameInput.val(student.name);
+          addressInput.val(student.address);
+
+          currentIndex = index;
+          isEditing = true;
+          createButton.css("display", "none");
+          updateButton.css("display", "inline");
+        }
+
+        const updateStudent = (name, address) => {
+          if (currentIndex !== -1) {
+            const student = students.find((s) => s.id === currentIndex);
+            student.name = name;
+            student.address = address;
+            displayStudent();
+            clearForm();
+            currentIndex = -1;
+            isEditing = false;
+            createButton.css("display", "inline");
+            updateButton.css("display", "none");
+          }
+        };
+
+        const deleteStudent = (index) => {
+          const studentIndex = students.findIndex((s) => s.id == index);
+          students.splice(studentIndex, 1);
+          displayStudent();
+        };
+
+        const clearForm = () => {
+          nameInput.val("");
+          addressInput.val("");
+        };
+
+        form.on("submit", function (event) {
+          event.preventDefault();
+          const name = nameInput.val().trim();
+          const address = addressInput.val().trim();
+          if (validateInput(name, address)) {
+            isEditing
+              ? updateStudent(name, address)
+              : addStudent(name, address);
+          } else {
+            displayMessage(
+              formMessageElement,
+              "vui long nhap day du thong tin"
+            );
+          }
+        });
+
+        lisStudents.on("click", "button", function () {
+          const index = $(this).data("index");
+          $(this).hasClass("edit") ? editStudent(index) : deleteStudent(index);
+        });
+
+        const displayMessage = (element, message) => element.text(message);
+
+        displayStudent();
+      });
+    </script>
+  </body>
+</html>

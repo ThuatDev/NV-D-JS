@@ -72,23 +72,7 @@
         let isEditing = false;
 
         function validateInput(name, address) {
-          let isValid = true;
-
-          if (name.trim() === "") {
-            $("#name-error").text("Vui lòng nhập tên.");
-            isValid = false;
-          } else {
-            $("#name-error").text("");
-          }
-
-          if (address.trim() === "") {
-            $("#address-error").text("Vui lòng nhập địa chỉ.");
-            isValid = false;
-          } else {
-            $("#address-error").text("");
-          }
-
-          return isValid;
+          return name.trim() !== "" && address.trim() !== "";
         }
 
         function displayStudent() {

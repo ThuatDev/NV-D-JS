@@ -48,6 +48,7 @@
       <ul class="list-group" id="list-students"></ul>
     </div>
 
+    <script src="scrip.js"></script>
     <script>
       $(document).ready(function () {
         const students = [
@@ -72,23 +73,7 @@
         let isEditing = false;
 
         function validateInput(name, address) {
-          let isValid = true;
-
-          if (name.trim() === "") {
-            $("#name-error").text("Vui lòng nhập tên.");
-            isValid = false;
-          } else {
-            $("#name-error").text("");
-          }
-
-          if (address.trim() === "") {
-            $("#address-error").text("Vui lòng nhập địa chỉ.");
-            isValid = false;
-          } else {
-            $("#address-error").text("");
-          }
-
-          return isValid;
+          return name.trim() !== "" && address.trim() !== "";
         }
 
         function displayStudent() {
@@ -121,7 +106,7 @@
         }
 
         function editStudent(index) {
-          const student = students.find((s) => s.id == index);
+          const student = students.find((s) => s.id === index);
           if (student) {
             nameInput.val(student.name);
             addressInput.val(student.address);
@@ -137,30 +122,22 @@
 
         function updateStudent(name, address) {
           if (currentIndex !== -1) {
-            const student = students.find((s) => s.id == currentIndex);
-            if (student) {
-              student.name = name;
-              student.address = address;
-              displayStudent();
-              clearForm();
-              currentIndex = -1;
-              isEditing = false;
-              createButton.css("display", "inline");
-              updateButton.css("display", "none");
-            } else {
-              console.error("Student not found for index:", currentIndex);
-            }
+            const student = students.find((s) => s.id === currentIndex);
+            student.name = name;
+            student.address = address;
+            displayStudent();
+            clearForm();
+            currentIndex = -1;
+            isEditing = false;
+            createButton.css("display", "inline");
+            updateButton.css("display", "none");
           }
         }
 
         function deleteStudent(index) {
           const studentIndex = students.findIndex((s) => s.id == index);
-          if (studentIndex !== -1) {
-            students.splice(studentIndex, 1);
-            displayStudent();
-          } else {
-            console.error("Student not found for index:", index);
-          }
+          students.splice(studentIndex, 1);
+          displayStudent();
         }
 
         function clearForm() {
@@ -168,24 +145,14 @@
           addressInput.val("");
         }
 
-        createButton.on("click", function () {
+        form.on("submit", function (event) {
+          event.preventDefault();
           const name = nameInput.val().trim();
           const address = addressInput.val().trim();
           if (validateInput(name, address)) {
-            addStudent(name, address);
-          } else {
-            displayMessage(
-              formMessageElement,
-              "Vui lòng nhập đầy đủ thông tin."
-            );
-          }
-        });
-
-        updateButton.on("click", function () {
-          const name = nameInput.val().trim();
-          const address = addressInput.val().trim();
-          if (validateInput(name, address)) {
-            updateStudent(name, address);
+            isEditing
+              ? updateStudent(name, address)
+              : addStudent(name, address);
           } else {
             displayMessage(
               formMessageElement,
